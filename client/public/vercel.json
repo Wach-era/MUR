@@ -1,0 +1,11 @@
+{
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build"
+    }
+  ],
+  "env": {
+    "VITE_API_URL": "https://mur-gk75.onrender.com"
+  }
+}

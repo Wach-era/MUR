@@ -12,6 +12,9 @@ import CategoryRow from './components/CategoryRow';
 import { useCart } from './context/CartContext';
 import { useAuth } from './context/AuthContext';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+
 function App() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -40,7 +43,7 @@ function App() {
 
   const fetchItems = async () => {
     try {
-      const response = await axios.get('/api/items');
+      const response = await axios.get(`${API_URL}/api/items`);
       setItems(response.data.data);
       setLoading(false);
     } catch (error) {
