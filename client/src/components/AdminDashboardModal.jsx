@@ -4,13 +4,17 @@ import { useAuth } from '../context/AuthContext';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-
 const AdminDashboardModal = ({ isOpen, onClose, items = [], onItemDeleted, onEditItem, onItemUpdated }) => {
   const [requests, setRequests] = useState([]);
   const [activeTab, setActiveTab] = useState('inventory');
   const [loadingRequests, setLoadingRequests] = useState(false);
   const [statusFilter, setStatusFilter] = useState('All');
   const [decrementingId, setDecrementingId] = useState(null);
+  
+  // ✅ New state for inventory search and filter
+  const [searchTerm, setSearchTerm] = useState('');
+  const [formatFilter, setFormatFilter] = useState('All');
+  
   const { token } = useAuth();
 
   const getAuthToken = useCallback(() => {
@@ -49,6 +53,21 @@ const AdminDashboardModal = ({ isOpen, onClose, items = [], onItemDeleted, onEdi
   }, [isOpen, activeTab, fetchCustomerRequests, onClose]);
 
   if (!isOpen) return null;
+
+  // ✅ Get unique formats for filter dropdown
+  const uniqueFormats = ['All', ...new Set(items.map(item => item.format).filter(Boolean))];
+
+  // ✅ Filter items based on search and format
+  const filteredItems = items.filter((item) => {
+    const matchesSearch = 
+      item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.artist?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.genre?.some(g => g.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    const matchesFormat = formatFilter === 'All' || item.format === formatFilter;
+    
+    return matchesSearch && matchesFormat;
+  });
 
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this item from inventory?')) return;
@@ -161,70 +180,125 @@ const AdminDashboardModal = ({ isOpen, onClose, items = [], onItemDeleted, onEdi
         {/* Tab Content */}
         <div className="flex-1 overflow-y-auto pr-1">
           {activeTab === 'inventory' ? (
-            <div className="overflow-x-auto">
-              {items.length === 0 ? (
-                <p className="text-center py-8 text-purple-300/60 text-sm">No inventory items available.</p>
-              ) : (
-                <table className="w-full text-left border-collapse text-sm">
-                  <thead>
-                    <tr className="border-b border-purple-900/40 text-purple-300/80 font-semibold text-xs uppercase">
-                      <th className="py-3 px-2">Title</th>
-                      <th className="py-3 px-2">Artist</th>
-                      <th className="py-3 px-2">Format</th>
-                      <th className="py-3 px-2">Price</th>
-                      <th className="py-3 px-2">Stock</th>
-                      <th className="py-3 px-2 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-purple-900/30">
-                    {items.map((item) => (
-                      <tr key={item._id} className="hover:bg-purple-900/10 transition-colors">
-                        <td className="py-3 px-2 font-bold text-white">{item.title}</td>
-                        <td className="py-3 px-2 text-purple-200/80">{item.artist}</td>
-                        <td className="py-3 px-2 text-purple-200/80">{item.format}</td>
-                        <td className="py-3 px-2 font-semibold text-purple-300">
-                          {typeof item.price === 'number' ? `Ksh ${item.price.toLocaleString()}` : item.price}
-                        </td>
-                        <td className="py-3 px-2">
-                          <span className={`px-2 py-0.5 rounded-md text-xs font-semibold ${
-                            item.stockQuantity > 0 
-                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' 
-                              : 'bg-red-500/20 text-red-300 border border-red-500/30'
-                          }`}>
-                            {item.stockQuantity}
-                          </span>
-                        </td>
-                        <td className="py-3 px-2 text-right space-x-2">
-                          <button 
-                            onClick={() => handleDecrementStock(item._id, item.stockQuantity)}
-                            disabled={item.stockQuantity <= 0 || decrementingId === item._id}
-                            className="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                            title="Decrement stock by 1"
-                          >
-                            {decrementingId === item._id ? 'Updating...' : '🛍️ Sold In-Store'}
-                          </button>
-                          <button 
-                            onClick={() => { onClose(); onEditItem(item); }} 
-                            className="px-3 py-1 bg-purple-900/50 hover:bg-purple-800/60 text-purple-200 border border-purple-500/30 rounded-lg text-xs font-semibold transition-all"
-                          >
-                            Edit
-                          </button>
-                          <button 
-                            onClick={() => handleDelete(item._id)} 
-                            className="px-3 py-1 bg-red-500/20 hover:bg-red-500/40 text-red-300 border border-red-500/30 rounded-lg text-xs font-semibold transition-all"
-                          >
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
+            <div>
+              {/* ✅ Search and Filter Controls */}
+              <div className="flex flex-col sm:flex-row gap-3 mb-4 bg-purple-950/40 p-3 rounded-xl border border-purple-500/20">
+                {/* Search Input */}
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    placeholder="🔍 Search by title, artist, or genre..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full bg-[#1c122e] text-white border border-purple-500/30 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-400 placeholder-purple-300/40"
+                  />
+                </div>
+                
+                {/* Format Filter Dropdown */}
+                <div className="sm:w-48">
+                  <select
+                    value={formatFilter}
+                    onChange={(e) => setFormatFilter(e.target.value)}
+                    className="w-full bg-[#1c122e] text-white border border-purple-500/30 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-400 cursor-pointer"
+                  >
+                    {uniqueFormats.map(format => (
+                      <option key={format} value={format}>
+                        {format === 'All' ? '📀 All Formats' : format}
+                      </option>
                     ))}
-                  </tbody>
-                </table>
-              )}
+                  </select>
+                </div>
+
+                {/* Clear Filters Button */}
+                {(searchTerm || formatFilter !== 'All') && (
+                  <button
+                    onClick={() => {
+                      setSearchTerm('');
+                      setFormatFilter('All');
+                    }}
+                    className="px-4 py-2.5 bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 rounded-xl text-sm font-semibold transition-all whitespace-nowrap"
+                  >
+                    ✕ Clear Filters
+                  </button>
+                )}
+              </div>
+
+              {/* Results Count */}
+              <div className="text-xs text-purple-300/60 mb-3">
+                Showing {filteredItems.length} of {items.length} items
+                {searchTerm && ` (matching "${searchTerm}")`}
+                {formatFilter !== 'All' && ` (${formatFilter})`}
+              </div>
+
+              <div className="overflow-x-auto">
+                {filteredItems.length === 0 ? (
+                  <p className="text-center py-8 text-purple-300/60 text-sm">
+                    {items.length === 0 
+                      ? 'No inventory items available.' 
+                      : 'No items match your search criteria.'}
+                  </p>
+                ) : (
+                  <table className="w-full text-left border-collapse text-sm">
+                    <thead>
+                      <tr className="border-b border-purple-900/40 text-purple-300/80 font-semibold text-xs uppercase">
+                        <th className="py-3 px-2">Title</th>
+                        <th className="py-3 px-2">Artist</th>
+                        <th className="py-3 px-2">Format</th>
+                        <th className="py-3 px-2">Price</th>
+                        <th className="py-3 px-2">Stock</th>
+                        <th className="py-3 px-2 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-purple-900/30">
+                      {filteredItems.map((item) => (
+                        <tr key={item._id} className="hover:bg-purple-900/10 transition-colors">
+                          <td className="py-3 px-2 font-bold text-white">{item.title}</td>
+                          <td className="py-3 px-2 text-purple-200/80">{item.artist}</td>
+                          <td className="py-3 px-2 text-purple-200/80">{item.format}</td>
+                          <td className="py-3 px-2 font-semibold text-purple-300">
+                            {typeof item.price === 'number' ? `Ksh ${item.price.toLocaleString()}` : item.price}
+                          </td>
+                          <td className="py-3 px-2">
+                            <span className={`px-2 py-0.5 rounded-md text-xs font-semibold ${
+                              item.stockQuantity > 0 
+                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' 
+                                : 'bg-red-500/20 text-red-300 border border-red-500/30'
+                            }`}>
+                              {item.stockQuantity}
+                            </span>
+                          </td>
+                          <td className="py-3 px-2 text-right space-x-2">
+                            <button 
+                              onClick={() => handleDecrementStock(item._id, item.stockQuantity)}
+                              disabled={item.stockQuantity <= 0 || decrementingId === item._id}
+                              className="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                              title="Decrement stock by 1"
+                            >
+                              {decrementingId === item._id ? 'Updating...' : '🛍️ Sold In-Store'}
+                            </button>
+                            <button 
+                              onClick={() => { onClose(); onEditItem(item); }} 
+                              className="px-3 py-1 bg-purple-900/50 hover:bg-purple-800/60 text-purple-200 border border-purple-500/30 rounded-lg text-xs font-semibold transition-all"
+                            >
+                              Edit
+                            </button>
+                            <button 
+                              onClick={() => handleDelete(item._id)} 
+                              className="px-3 py-1 bg-red-500/20 hover:bg-red-500/40 text-red-300 border border-red-500/30 rounded-lg text-xs font-semibold transition-all"
+                            >
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
             </div>
           ) : (
             <div className="space-y-3">
-              {/* Filter Controls */}
+              {/* Filter Controls for Requests */}
               <div className="flex items-center justify-between bg-purple-950/40 p-3 rounded-xl border border-purple-500/20 mb-2">
                 <span className="text-xs font-bold text-purple-300">Filter Requests:</span>
                 <select 

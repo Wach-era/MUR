@@ -3,7 +3,6 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-
 const EditItemModal = ({ item, isOpen, onClose, onItemUpdated }) => {
   const [formData, setFormData] = useState({ ...item });
 
@@ -30,31 +29,100 @@ const EditItemModal = ({ item, isOpen, onClose, onItemUpdated }) => {
   };
 
   return (
-    <div style={styles.overlay}>
-      <div style={styles.modal}>
-        <h3>Edit Item Details</h3>
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <label>Title: <input name="title" value={formData.title || ''} onChange={handleChange} style={styles.input} /></label>
-          <label>Price (Ksh): <input name="price" type="number" step="0.01" value={formData.price || 0} onChange={handleChange} style={styles.input} /></label>
-          <label>Stock Quantity: <input name="stockQuantity" type="number" value={formData.stockQuantity || 1} onChange={handleChange} style={styles.input} /></label>
-          <div style={styles.actions}>
-            <button type="button" onClick={onClose} style={styles.cancelBtn}>Cancel</button>
-            <button type="submit" style={styles.submitBtn}>Save Changes</button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+      <div className="w-full max-w-md bg-[#140c24] border border-purple-500/20 rounded-2xl p-6 shadow-2xl">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-bold text-white">✏️ Edit Item Details</h3>
+          <button 
+            onClick={onClose} 
+            className="text-gray-400 hover:text-white text-xl p-1 transition-colors"
+            aria-label="Close"
+          >
+            ✕
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Title */}
+          <div>
+            <label className="block text-sm font-medium text-purple-300/80 mb-1">Title</label>
+            <input 
+              name="title" 
+              value={formData.title || ''} 
+              onChange={handleChange} 
+              className="w-full bg-black/40 border border-purple-500/30 rounded-xl p-2.5 text-sm text-white placeholder-purple-300/40 focus:outline-none focus:border-purple-400" 
+            />
+          </div>
+
+          {/* Image URL */}
+          <div>
+            <label className="block text-sm font-medium text-purple-300/80 mb-1">Image URL</label>
+            <input 
+              name="imageUrl" 
+              type="url"
+              value={formData.imageUrl || ''} 
+              onChange={handleChange} 
+              className="w-full bg-black/40 border border-purple-500/30 rounded-xl p-2.5 text-sm text-white placeholder-purple-300/40 focus:outline-none focus:border-purple-400" 
+            />
+          </div>
+
+          {/* Price */}
+          <div>
+            <label className="block text-sm font-medium text-purple-300/80 mb-1">Price (Ksh)</label>
+            <input 
+              name="price" 
+              type="number" 
+              step="0.01" 
+              value={formData.price || 0} 
+              onChange={handleChange} 
+              className="w-full bg-black/40 border border-purple-500/30 rounded-xl p-2.5 text-sm text-white placeholder-purple-300/40 focus:outline-none focus:border-purple-400" 
+            />
+          </div>
+
+          {/* Stock Quantity */}
+          <div>
+            <label className="block text-sm font-medium text-purple-300/80 mb-1">Stock Quantity</label>
+            <input 
+              name="stockQuantity" 
+              type="number" 
+              value={formData.stockQuantity || 1} 
+              onChange={handleChange} 
+              className="w-full bg-black/40 border border-purple-500/30 rounded-xl p-2.5 text-sm text-white placeholder-purple-300/40 focus:outline-none focus:border-purple-400" 
+            />
+          </div>
+
+          {/* Condition (Pre-owned checkbox) */}
+          <div className="flex items-center gap-3">
+            <input 
+              name="isPreOwned" 
+              type="checkbox" 
+              checked={formData.isPreOwned || false} 
+              onChange={handleChange} 
+              className="w-4 h-4 accent-purple-600 bg-black/40 border-purple-500/30 rounded"
+            />
+            <label className="text-sm font-medium text-purple-300/80">This item is pre-owned</label>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex justify-end gap-3 pt-2">
+            <button 
+              type="button" 
+              onClick={onClose} 
+              className="px-4 py-2 bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 rounded-xl text-sm font-medium transition-all cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit" 
+              className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-medium rounded-xl text-sm transition-all shadow-md cursor-pointer"
+            >
+              💾 Save Changes
+            </button>
           </div>
         </form>
       </div>
     </div>
   );
-};
-
-const styles = {
-  overlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1100 },
-  modal: { backgroundColor: '#fff', padding: '24px', borderRadius: '8px', width: '380px' },
-  form: { display: 'flex', flexDirection: 'column', gap: '10px' },
-  input: { width: '100%', padding: '6px', margin: '4px 0 8px 0' },
-  actions: { display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '12px' },
-  cancelBtn: { padding: '8px 12px', background: '#e2e8f0', border: 'none', borderRadius: '4px', cursor: 'pointer' },
-  submitBtn: { padding: '8px 12px', background: '#2b6cb0', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }
 };
 
 export default EditItemModal;
