@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+
 const AddProductModal = ({ isOpen, onClose, onItemAdded }) => {
   const [formData, setFormData] = useState({
     title: '', artist: '', format: 'Vinyl', price: '', genre: '', imageUrl: '', isPreOwned: false, isSigned: false
@@ -11,7 +14,7 @@ const AddProductModal = ({ isOpen, onClose, onItemAdded }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('/api/items', {
+      const res = await axios.post(`${API_URL}/api/items`, {
         ...formData,
         price: parseFloat(formData.price),
         genre: formData.genre.split(',').map((g) => g.trim())

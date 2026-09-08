@@ -2,6 +2,9 @@ import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+
 const AdminDashboardModal = ({ isOpen, onClose, items = [], onItemDeleted, onEditItem, onItemUpdated }) => {
   const [requests, setRequests] = useState([]);
   const [activeTab, setActiveTab] = useState('inventory');
@@ -18,7 +21,7 @@ const AdminDashboardModal = ({ isOpen, onClose, items = [], onItemDeleted, onEdi
     setLoadingRequests(true);
     try {
       const authToken = getAuthToken();
-      const res = await axios.get('/api/requests/admin/all', {
+      const res = await axios.get(`${API_URL}/api/requests/admin/all`, {
         headers: { Authorization: `Bearer ${authToken}` }
       });
       setRequests(res.data.data || res.data || []);
@@ -51,7 +54,7 @@ const AdminDashboardModal = ({ isOpen, onClose, items = [], onItemDeleted, onEdi
     if (!window.confirm('Are you sure you want to delete this item from inventory?')) return;
     try {
       const authToken = getAuthToken();
-      await axios.delete(`/api/items/${id}`, {
+      await axios.delete(`${API_URL}/api/items/${id}`, {
         headers: { Authorization: `Bearer ${authToken}` }
       });
       onItemDeleted(id);
@@ -70,7 +73,7 @@ const AdminDashboardModal = ({ isOpen, onClose, items = [], onItemDeleted, onEdi
     try {
       const authToken = getAuthToken();
       const res = await axios.patch(
-        `/api/items/${itemId}/decrement`, 
+        `${API_URL}/api/items/${itemId}/decrement`, 
         { quantity: 1 },
         { headers: { Authorization: `Bearer ${authToken}` } }
       );
@@ -94,7 +97,7 @@ const AdminDashboardModal = ({ isOpen, onClose, items = [], onItemDeleted, onEdi
 
     try {
       const authToken = getAuthToken();
-      await axios.patch(`/api/requests/${reqId}`, { status: newStatus }, {
+      await axios.patch(`${API_URL}/api/requests/${reqId}`, { status: newStatus }, {
         headers: { Authorization: `Bearer ${authToken}` }
       });
     } catch (err) {

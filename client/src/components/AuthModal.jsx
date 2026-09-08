@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const AuthModal = ({ isOpen, onClose }) => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', password: '', phone: '' });
@@ -16,9 +18,10 @@ const AuthModal = ({ isOpen, onClose }) => {
     e.preventDefault();
     setError('');
 
+    // ✅ FIXED - Use API_URL instead of hardcoded localhost
     const endpoint = isRegistering
-      ? 'http://localhost:5000/api/auth/register'
-      : 'http://localhost:5000/api/auth/login';
+      ? `${API_URL}/api/auth/register`   
+      : `${API_URL}/api/auth/login`;     
 
     try {
       const res = await axios.post(endpoint, formData);

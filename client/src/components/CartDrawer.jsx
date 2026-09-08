@@ -4,6 +4,9 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import AuthModal from './AuthModal';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+
 const CartDrawer = () => {
   const { 
     cart, 
@@ -83,7 +86,7 @@ const CartDrawer = () => {
     try {
       const authToken = token || localStorage.getItem('token');
       const response = await axios.post(
-        '/api/payments/stkpush',
+        `${API_URL}/api/payments/stkpush`,
         {
           phone: formattedPhone,
           amount: Math.round(Number(subtotal) || 0),

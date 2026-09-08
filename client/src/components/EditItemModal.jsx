@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+
 const EditItemModal = ({ item, isOpen, onClose, onItemUpdated }) => {
   const [formData, setFormData] = useState({ ...item });
 
@@ -18,7 +21,7 @@ const EditItemModal = ({ item, isOpen, onClose, onItemUpdated }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.put(`/api/items/${item._id}`, formData);
+      const res = await axios.put(`${API_URL}/api/items/${item._id}`, formData);
       onItemUpdated(res.data.data);
       onClose();
     } catch (err) {

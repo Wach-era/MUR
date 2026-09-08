@@ -2,6 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+
 const RequestModal = ({ isOpen, onClose }) => {
   const [activeTab, setActiveTab] = useState('new'); // 'new' | 'my-requests'
   const [formData, setFormData] = useState({
@@ -22,7 +25,7 @@ const RequestModal = ({ isOpen, onClose }) => {
     setLoadingRequests(true);
     try {
       const authToken = token || localStorage.getItem('token');
-      const res = await axios.get('/api/requests/my-requests', {
+      const res = await axios.get(`${API_URL}/api/requests/my-requests`, {
         headers: { Authorization: `Bearer ${authToken}` }
       });
       setMyRequests(res.data.data || res.data || []);
