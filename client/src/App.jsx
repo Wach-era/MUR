@@ -238,14 +238,14 @@ function App() {
         ) : activeCategoryView === 'All' && searchTerm === '' && conditionFilter === 'All' ? (
           <div className="space-y-8 sm:space-y-10">
             <CategoryRow 
-              title="🎵 Rare & Pre-Owned Vinyls" 
+              title="🎵 Brand New, Limited Edition & Pre-Owned Vinyls" 
               formatKey="Vinyl" 
               items={items} 
               onViewAll={handleViewAll}
               onItemClick={(item) => setSelectedItem(item)} 
             />
             <CategoryRow 
-              title="💿 CDs & Compact Discs" 
+              title="💿 CDs" 
               formatKey="CD" 
               items={items} 
               onViewAll={handleViewAll}
