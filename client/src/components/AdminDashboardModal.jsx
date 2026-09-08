@@ -11,7 +11,7 @@ const AdminDashboardModal = ({ isOpen, onClose, items = [], onItemDeleted, onEdi
   const [statusFilter, setStatusFilter] = useState('All');
   const [decrementingId, setDecrementingId] = useState(null);
   
-  // ✅ New state for inventory search and filter
+  // State for inventory search and filter
   const [searchTerm, setSearchTerm] = useState('');
   const [formatFilter, setFormatFilter] = useState('All');
   
@@ -54,10 +54,10 @@ const AdminDashboardModal = ({ isOpen, onClose, items = [], onItemDeleted, onEdi
 
   if (!isOpen) return null;
 
-  // ✅ Get unique formats for filter dropdown
+  // Get unique formats for filter dropdown
   const uniqueFormats = ['All', ...new Set(items.map(item => item.format).filter(Boolean))];
 
-  // ✅ Filter items based on search and format
+  // Filter items based on search and format
   const filteredItems = items.filter((item) => {
     const matchesSearch = 
       item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -132,74 +132,77 @@ const AdminDashboardModal = ({ isOpen, onClose, items = [], onItemDeleted, onEdi
 
   return (
     <div 
-      className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" 
+      className="fixed inset-0 z-[1100] flex items-center justify-center p-2 sm:p-4 bg-black/70 backdrop-blur-sm overflow-y-auto" 
       onClick={onClose}
     >
       <div 
-        className="w-full max-w-5xl bg-[#120a1f] border border-purple-500/20 rounded-2xl p-6 shadow-2xl relative text-white max-h-[80vh] flex flex-col" 
+        className="w-full max-w-5xl mx-1 sm:mx-0 bg-[#120a1f] border border-purple-500/20 rounded-2xl p-3 sm:p-6 shadow-2xl relative text-white max-h-[95vh] sm:max-h-[90vh] flex flex-col" 
         onClick={(e) => e.stopPropagation()}
       >
         
-        {/* Header */}
-        <div className="flex justify-between items-center pb-4 border-b border-purple-900/40">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <span>⚙️</span> Admin Control Panel
+        {/* Header - responsive */}
+        <div className="flex flex-wrap items-center justify-between gap-2 pb-3 sm:pb-4 border-b border-purple-900/40">
+          <h2 className="text-base sm:text-xl font-bold flex items-center gap-2">
+            <span>⚙️</span> 
+            <span className="hidden xs:inline">Admin Control Panel</span>
+            <span className="xs:hidden">Admin Panel</span>
           </h2>
           <button 
             onClick={onClose} 
-            className="text-gray-400 hover:text-white text-xl p-1 transition-colors rounded-lg hover:bg-purple-900/30" 
+            className="text-gray-400 hover:text-white text-xl p-1.5 sm:p-1 transition-colors rounded-lg hover:bg-purple-900/30 touch-target flex items-center justify-center" 
+            aria-label="Close modal"
           >
             ✕
           </button>
         </div>
 
-        {/* Tabs */}
-        <div className="flex gap-4 border-b border-purple-900/40 my-4">
+        {/* Tabs - scrollable on mobile */}
+        <div className="flex gap-2 sm:gap-4 border-b border-purple-900/40 my-3 sm:my-4 overflow-x-auto scrollbar-hide">
           <button 
-            className={`pb-2.5 px-2 text-sm font-semibold transition-all cursor-pointer ${
+            className={`pb-2.5 px-2 sm:px-3 text-xs sm:text-sm font-semibold transition-all cursor-pointer whitespace-nowrap ${
               activeTab === 'inventory' 
                 ? 'border-b-2 border-purple-400 text-purple-300' 
                 : 'text-gray-400 hover:text-white'
             }`}
             onClick={() => setActiveTab('inventory')}
           >
-            Manage Inventory ({items.length})
+            📦 Inventory ({items.length})
           </button>
           <button 
-            className={`pb-2.5 px-2 text-sm font-semibold transition-all cursor-pointer ${
+            className={`pb-2.5 px-2 sm:px-3 text-xs sm:text-sm font-semibold transition-all cursor-pointer whitespace-nowrap ${
               activeTab === 'requests' 
                 ? 'border-b-2 border-purple-400 text-purple-300' 
                 : 'text-gray-400 hover:text-white'
             }`}
             onClick={() => setActiveTab('requests')}
           >
-            Customer Requests ({requests.length})
+            📋 Requests ({requests.length})
           </button>
         </div>
 
-        {/* Tab Content */}
-        <div className="flex-1 overflow-y-auto pr-1">
+        {/* Tab Content - scrollable */}
+        <div className="flex-1 overflow-y-auto pr-0 sm:pr-1">
           {activeTab === 'inventory' ? (
             <div>
-              {/* ✅ Search and Filter Controls */}
-              <div className="flex flex-col sm:flex-row gap-3 mb-4 bg-purple-950/40 p-3 rounded-xl border border-purple-500/20">
+              {/* Search and Filter Controls - responsive */}
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-3 sm:mb-4 bg-purple-950/40 p-2.5 sm:p-3 rounded-xl border border-purple-500/20">
                 {/* Search Input */}
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <input
                     type="text"
-                    placeholder="🔍 Search by title, artist, or genre..."
+                    placeholder="🔍 Search by title, artist..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full bg-[#1c122e] text-white border border-purple-500/30 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-400 placeholder-purple-300/40"
+                    className="w-full bg-[#1c122e] text-white border border-purple-500/30 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm focus:outline-none focus:border-purple-400 placeholder-purple-300/40"
                   />
                 </div>
                 
                 {/* Format Filter Dropdown */}
-                <div className="sm:w-48">
+                <div className="w-full sm:w-40 lg:w-48">
                   <select
                     value={formatFilter}
                     onChange={(e) => setFormatFilter(e.target.value)}
-                    className="w-full bg-[#1c122e] text-white border border-purple-500/30 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-400 cursor-pointer"
+                    className="w-full bg-[#1c122e] text-white border border-purple-500/30 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm focus:outline-none focus:border-purple-400 cursor-pointer"
                   >
                     {uniqueFormats.map(format => (
                       <option key={format} value={format}>
@@ -216,21 +219,22 @@ const AdminDashboardModal = ({ isOpen, onClose, items = [], onItemDeleted, onEdi
                       setSearchTerm('');
                       setFormatFilter('All');
                     }}
-                    className="px-4 py-2.5 bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 rounded-xl text-sm font-semibold transition-all whitespace-nowrap"
+                    className="px-3 sm:px-4 py-2 sm:py-2.5 bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap touch-target"
                   >
-                    ✕ Clear Filters
+                    ✕ Clear
                   </button>
                 )}
               </div>
 
               {/* Results Count */}
-              <div className="text-xs text-purple-300/60 mb-3">
+              <div className="text-[10px] sm:text-xs text-purple-300/60 mb-2 sm:mb-3">
                 Showing {filteredItems.length} of {items.length} items
                 {searchTerm && ` (matching "${searchTerm}")`}
                 {formatFilter !== 'All' && ` (${formatFilter})`}
               </div>
 
-              <div className="overflow-x-auto">
+              {/* Inventory Table - horizontally scrollable on mobile */}
+              <div className="overflow-x-auto -mx-3 sm:mx-0 px-3 sm:px-0">
                 {filteredItems.length === 0 ? (
                   <p className="text-center py-8 text-purple-300/60 text-sm">
                     {items.length === 0 
@@ -238,28 +242,38 @@ const AdminDashboardModal = ({ isOpen, onClose, items = [], onItemDeleted, onEdi
                       : 'No items match your search criteria.'}
                   </p>
                 ) : (
-                  <table className="w-full text-left border-collapse text-sm">
+                  <table className="w-full text-left border-collapse text-xs sm:text-sm min-w-[600px] sm:min-w-full">
                     <thead>
-                      <tr className="border-b border-purple-900/40 text-purple-300/80 font-semibold text-xs uppercase">
-                        <th className="py-3 px-2">Title</th>
-                        <th className="py-3 px-2">Artist</th>
-                        <th className="py-3 px-2">Format</th>
-                        <th className="py-3 px-2">Price</th>
-                        <th className="py-3 px-2">Stock</th>
-                        <th className="py-3 px-2 text-right">Actions</th>
+                      <tr className="border-b border-purple-900/40 text-purple-300/80 font-semibold text-[10px] sm:text-xs uppercase">
+                        <th className="py-2 sm:py-3 px-1.5 sm:px-2">Title</th>
+                        <th className="py-2 sm:py-3 px-1.5 sm:px-2 hidden sm:table-cell">Artist</th>
+                        <th className="py-2 sm:py-3 px-1.5 sm:px-2 hidden md:table-cell">Format</th>
+                        <th className="py-2 sm:py-3 px-1.5 sm:px-2">Price</th>
+                        <th className="py-2 sm:py-3 px-1.5 sm:px-2">Stock</th>
+                        <th className="py-2 sm:py-3 px-1.5 sm:px-2 text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-purple-900/30">
                       {filteredItems.map((item) => (
                         <tr key={item._id} className="hover:bg-purple-900/10 transition-colors">
-                          <td className="py-3 px-2 font-bold text-white">{item.title}</td>
-                          <td className="py-3 px-2 text-purple-200/80">{item.artist}</td>
-                          <td className="py-3 px-2 text-purple-200/80">{item.format}</td>
-                          <td className="py-3 px-2 font-semibold text-purple-300">
-                            {typeof item.price === 'number' ? `Ksh ${item.price.toLocaleString()}` : item.price}
+                          <td className="py-2 sm:py-3 px-1.5 sm:px-2 font-bold text-white text-xs sm:text-sm">
+                            <div className="truncate max-w-[80px] sm:max-w-none" title={item.title}>
+                              {item.title}
+                            </div>
                           </td>
-                          <td className="py-3 px-2">
-                            <span className={`px-2 py-0.5 rounded-md text-xs font-semibold ${
+                          <td className="py-2 sm:py-3 px-1.5 sm:px-2 text-purple-200/80 text-xs sm:text-sm hidden sm:table-cell">
+                            <div className="truncate max-w-[80px]" title={item.artist}>
+                              {item.artist}
+                            </div>
+                          </td>
+                          <td className="py-2 sm:py-3 px-1.5 sm:px-2 text-purple-200/80 text-xs sm:text-sm hidden md:table-cell">
+                            {item.format}
+                          </td>
+                          <td className="py-2 sm:py-3 px-1.5 sm:px-2 font-semibold text-purple-300 text-xs sm:text-sm">
+                            Ksh {item.price?.toLocaleString()}
+                          </td>
+                          <td className="py-2 sm:py-3 px-1.5 sm:px-2">
+                            <span className={`px-1.5 sm:px-2 py-0.5 rounded-md text-[10px] sm:text-xs font-semibold ${
                               item.stockQuantity > 0 
                                 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' 
                                 : 'bg-red-500/20 text-red-300 border border-red-500/30'
@@ -267,27 +281,29 @@ const AdminDashboardModal = ({ isOpen, onClose, items = [], onItemDeleted, onEdi
                               {item.stockQuantity}
                             </span>
                           </td>
-                          <td className="py-3 px-2 text-right space-x-2">
-                            <button 
-                              onClick={() => handleDecrementStock(item._id, item.stockQuantity)}
-                              disabled={item.stockQuantity <= 0 || decrementingId === item._id}
-                              className="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                              title="Decrement stock by 1"
-                            >
-                              {decrementingId === item._id ? 'Updating...' : '🛍️ Sold In-Store'}
-                            </button>
-                            <button 
-                              onClick={() => { onClose(); onEditItem(item); }} 
-                              className="px-3 py-1 bg-purple-900/50 hover:bg-purple-800/60 text-purple-200 border border-purple-500/30 rounded-lg text-xs font-semibold transition-all"
-                            >
-                              Edit
-                            </button>
-                            <button 
-                              onClick={() => handleDelete(item._id)} 
-                              className="px-3 py-1 bg-red-500/20 hover:bg-red-500/40 text-red-300 border border-red-500/30 rounded-lg text-xs font-semibold transition-all"
-                            >
-                              Delete
-                            </button>
+                          <td className="py-2 sm:py-3 px-1.5 sm:px-2 text-right">
+                            <div className="flex flex-wrap items-center justify-end gap-1 sm:gap-2">
+                              <button 
+                                onClick={() => handleDecrementStock(item._id, item.stockQuantity)}
+                                disabled={item.stockQuantity <= 0 || decrementingId === item._id}
+                                className="px-1.5 sm:px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 border border-amber-500/30 rounded-lg text-[10px] sm:text-xs font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed touch-target"
+                                title="Decrement stock by 1"
+                              >
+                                {decrementingId === item._id ? '...' : '🛍️'}
+                              </button>
+                              <button 
+                                onClick={() => { onClose(); onEditItem(item); }} 
+                                className="px-2 sm:px-3 py-1 bg-purple-900/50 hover:bg-purple-800/60 text-purple-200 border border-purple-500/30 rounded-lg text-[10px] sm:text-xs font-semibold transition-all touch-target"
+                              >
+                                Edit
+                              </button>
+                              <button 
+                                onClick={() => handleDelete(item._id)} 
+                                className="px-2 sm:px-3 py-1 bg-red-500/20 hover:bg-red-500/40 text-red-300 border border-red-500/30 rounded-lg text-[10px] sm:text-xs font-semibold transition-all touch-target"
+                              >
+                                Delete
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -298,13 +314,13 @@ const AdminDashboardModal = ({ isOpen, onClose, items = [], onItemDeleted, onEdi
             </div>
           ) : (
             <div className="space-y-3">
-              {/* Filter Controls for Requests */}
-              <div className="flex items-center justify-between bg-purple-950/40 p-3 rounded-xl border border-purple-500/20 mb-2">
-                <span className="text-xs font-bold text-purple-300">Filter Requests:</span>
+              {/* Filter Controls for Requests - responsive */}
+              <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-2 bg-purple-950/40 p-2.5 sm:p-3 rounded-xl border border-purple-500/20">
+                <span className="text-[10px] sm:text-xs font-bold text-purple-300">Filter Requests:</span>
                 <select 
                   value={statusFilter} 
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="bg-[#1c122e] text-white border border-purple-500/30 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-purple-400 cursor-pointer"
+                  className="w-full xs:w-auto bg-[#1c122e] text-white border border-purple-500/30 rounded-lg px-2 sm:px-3 py-1.5 text-[10px] sm:text-xs focus:outline-none focus:border-purple-400 cursor-pointer"
                 >
                   <option value="All">All Statuses ({requests.length})</option>
                   <option value="Pending">🕐 Pending</option>
@@ -320,32 +336,36 @@ const AdminDashboardModal = ({ isOpen, onClose, items = [], onItemDeleted, onEdi
                 <p className="text-center py-8 text-purple-300/60 text-sm">No requests found matching "{statusFilter}".</p>
               ) : (
                 filteredRequests.map((req) => (
-                  <div key={req._id} className="p-4 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border border-purple-900/40 bg-purple-950/20">
-                    <div className="flex-1">
-                      <div className="text-sm font-bold text-white">
-                        {req.title || req.albumOrItemTitle} <span className="font-normal text-purple-300/80">by</span> <em className="not-italic font-medium text-purple-200">{req.artist}</em> <span className="text-xs text-purple-400">({req.format})</span>
+                  <div key={req._id} className="p-3 sm:p-4 rounded-xl flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 sm:gap-4 border border-purple-900/40 bg-purple-950/20">
+                    <div className="flex-1 min-w-0 w-full">
+                      <div className="text-xs sm:text-sm font-bold text-white break-words">
+                        {req.title || req.albumOrItemTitle} 
+                        <span className="font-normal text-purple-300/80"> by </span>
+                        <em className="not-italic font-medium text-purple-200">{req.artist}</em>
+                        <span className="text-[10px] sm:text-xs text-purple-400"> ({req.format})</span>
                       </div>
-                      <div className="text-xs text-purple-300/70 mt-1">
-                        Requested by: <strong className="text-white">{req.user?.name || 'Customer'}</strong> ({req.user?.email || 'No email'} | {req.user?.phone || 'No phone'})
+                      <div className="text-[10px] sm:text-xs text-purple-300/70 mt-1 break-words">
+                        Requested by: <strong className="text-white">{req.user?.name || 'Customer'}</strong>
+                        <span className="hidden xs:inline"> ({req.user?.email || 'No email'})</span>
                       </div>
                       {(req.notes || req.additionalDetails) && (
-                        <p className="mt-2 text-xs text-gray-300 bg-black/30 p-2 rounded-lg border border-purple-500/20">
+                        <p className="mt-2 text-[10px] sm:text-xs text-gray-300 bg-black/30 p-2 rounded-lg border border-purple-500/20 break-words">
                           Note: {req.notes || req.additionalDetails}
                         </p>
                       )}
                     </div>
 
-                    <div className="w-full md:w-auto">
-                      <label className="block text-xs font-bold text-purple-300 mb-1">Status:</label>
+                    <div className="w-full lg:w-auto">
+                      <label className="block text-[10px] sm:text-xs font-bold text-purple-300 mb-1">Status:</label>
                       <select 
                         value={req.status} 
                         onChange={(e) => handleStatusChange(req._id, e.target.value)}
-                        className="bg-[#1c122e] text-white border border-purple-500/30 rounded-xl px-3 py-2 text-xs font-medium focus:outline-none focus:border-purple-400 w-full md:w-48 cursor-pointer"
+                        className="w-full bg-[#1c122e] text-white border border-purple-500/30 rounded-xl px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs font-medium focus:outline-none focus:border-purple-400 lg:w-48 cursor-pointer"
                       >
                         <option value="Pending">🕐 Pending</option>
                         <option value="Met / Sourced">✅ Met / Sourced</option>
-                        <option value="In Stock">📦 In Stock (Added to Store)</option>
-                        <option value="Not Met / Unavailable">❌ Request Not Met</option>
+                        <option value="In Stock">📦 In Stock</option>
+                        <option value="Not Met / Unavailable">❌ Not Met</option>
                       </select>
                     </div>
                   </div>
